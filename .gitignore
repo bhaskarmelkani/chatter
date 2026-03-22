@@ -1,0 +1,13 @@
+.claude/settings.local.json
+.claude/worktrees/
+
+.DS_Store
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+
+.chatter/runtime.json
+.chatter/logs/
+.chatter/cache/
