@@ -142,8 +142,8 @@ export default function App() {
     <SidebarProvider defaultOpen>
       <AppSidebar />
       <SidebarInset className="bg-background">
-        <header className="sticky top-0 z-20 px-4 pb-0 pt-4 md:px-6 md:pt-6">
-          <div className="glass-topbar flex min-h-[76px] flex-wrap items-center gap-4 px-4 py-3 md:px-6">
+        <header className="sticky top-0 z-20 px-4 pb-0 pt-4 md:px-6 md:pt-5">
+          <div className="glass-topbar flex min-h-[72px] flex-wrap items-center gap-4 px-4 py-3 md:px-5">
             <div className="flex min-w-0 items-center gap-3">
               <SidebarTrigger variant="ghost" size="icon" className="-ml-1" />
               <Separator
@@ -171,7 +171,7 @@ export default function App() {
                   </BreadcrumbList>
                 </Breadcrumb>
                 <p className="hidden text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground/75 lg:block">
-                  Chatter control plane
+                  Telemetry dashboard
                 </p>
               </div>
             </div>
@@ -182,12 +182,12 @@ export default function App() {
                 <Input
                   aria-label="Search dashboard"
                   placeholder="Search sessions, models, or providers"
-                  className="h-10 w-[320px] rounded-full border-white/70 bg-background/80 pl-9"
+                  className="h-10 w-[320px] rounded-full border-border/70 bg-white pl-9 shadow-none"
                 />
               </div>
               <Badge
                 variant="outline"
-                className="hidden h-10 items-center gap-2 rounded-full border-emerald-200/70 bg-emerald-50/80 px-4 text-emerald-700 md:inline-flex"
+                className="hidden h-10 items-center gap-2 rounded-full border-emerald-200 bg-emerald-50 px-4 text-emerald-700 md:inline-flex"
               >
                 <ActivityIcon className="size-3.5" />
                 {daemonOnline ? "Daemon online" : "Checking daemon"}
@@ -199,7 +199,7 @@ export default function App() {
               >
                 Open sessions
               </Link>
-              <div className="flex size-10 items-center justify-center rounded-full border border-white/70 bg-background/80 text-sm font-semibold text-foreground shadow-sm">
+              <div className="flex size-10 items-center justify-center rounded-full border border-border/70 bg-white text-sm font-semibold text-foreground">
                 CH
               </div>
             </div>

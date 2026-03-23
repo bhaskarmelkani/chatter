@@ -124,6 +124,8 @@ export function createServer(
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
     const dayStart = startOfDay.getTime();
+    const rollingWindowMs = 24 * 60 * 60 * 1000;
+    const rollingWindowStart = now - rollingWindowMs;
 
     // Provider health
     const providers = [];
@@ -148,6 +150,10 @@ export function createServer(
     const allSessions = ledger.getSessions({ limit: 400 });
     const visibleSessions = filterDisplaySessions(allSessions);
     const todaySessions = visibleSessions.filter((s) => s.started_at >= dayStart);
+    const sessions24h = visibleSessions.filter(
+      (session) =>
+        session.started_at >= rollingWindowStart && session.started_at <= now,
+    );
 
     let tokensToday = 0;
     let costToday = 0;
@@ -206,45 +212,78 @@ export function createServer(
       }
     }
 
-    // Session buckets + provider stats: single pass over todaySessions
-    const currentHour = new Date().getHours();
-    const buckets = Array.from({ length: currentHour + 1 }, (_, h) => ({
-      bucketStart: new Date(dayStart + h * 3600000).toISOString(),
-      label: `${String(h).padStart(2, "0")}:00`,
-      sessions: 0,
-      activeSessions: 0,
-      tokens: 0,
-      cost: 0,
-    }));
-    const providerStats = new Map<string, { sessions: number; tokens: number; cost: number }>();
+    // Session buckets + provider stats: rolling 24h window
+    const bucketSizeMs = 60 * 60 * 1000;
+    const buckets = Array.from({ length: 24 }, (_, index) => {
+      const bucketStart = rollingWindowStart + index * bucketSizeMs;
 
-    for (const s of todaySessions) {
-      const h = new Date(s.started_at).getHours();
-      if (h < buckets.length) {
-        buckets[h].sessions++;
-        buckets[h].tokens += s.token_input + s.token_output;
-        buckets[h].cost += s.estimated_cost;
-        if (s.status === "active") buckets[h].activeSessions++;
+      return {
+        bucketStart: new Date(bucketStart).toISOString(),
+        label: new Date(bucketStart).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        sessions: 0,
+        activeSessions: 0,
+        tokens: 0,
+        cost: 0,
+      };
+    });
+    const providerStats = new Map<
+      string,
+      { sessions: number; tokens: number; cost: number }
+    >();
+
+    for (const session of sessions24h) {
+      const bucketIndex = Math.floor(
+        (session.started_at - rollingWindowStart) / bucketSizeMs,
+      );
+      if (bucketIndex >= 0 && bucketIndex < buckets.length) {
+        const bucket = buckets[bucketIndex];
+        bucket.sessions += 1;
+        bucket.tokens += session.token_input + session.token_output;
+        bucket.cost += session.estimated_cost;
+        if (session.status === "active") {
+          bucket.activeSessions += 1;
+        }
       }
-      const ps = providerStats.get(s.provider_id) ?? { sessions: 0, tokens: 0, cost: 0 };
-      ps.sessions++;
-      ps.tokens += s.token_input + s.token_output;
-      ps.cost += s.estimated_cost;
-      providerStats.set(s.provider_id, ps);
+
+      const provider = providerStats.get(session.provider_id) ?? {
+        sessions: 0,
+        tokens: 0,
+        cost: 0,
+      };
+      provider.sessions += 1;
+      provider.tokens += session.token_input + session.token_output;
+      provider.cost += session.estimated_cost;
+      providerStats.set(session.provider_id, provider);
     }
 
     const sessionBuckets = buckets;
-    const providerBreakdown = providers.map((p) => {
-      const stats = providerStats.get(p.provider) ?? { sessions: 0, tokens: 0, cost: 0 };
-      return {
-        provider: p.provider,
-        status: p.status,
-        activeSessions: p.activeSessions,
-        sessions24h: stats.sessions,
-        tokens24h: stats.tokens,
-        cost24h: stats.cost,
-      };
-    });
+    const providerBreakdown = providers
+      .map((provider) => {
+        const stats = providerStats.get(provider.provider) ?? {
+          sessions: 0,
+          tokens: 0,
+          cost: 0,
+        };
+
+        return {
+          provider: provider.provider,
+          status: provider.status,
+          activeSessions: provider.activeSessions,
+          sessions24h: stats.sessions,
+          tokens24h: stats.tokens,
+          cost24h: stats.cost,
+        };
+      })
+      .sort((a, b) => {
+        if (b.tokens24h !== a.tokens24h) {
+          return b.tokens24h - a.tokens24h;
+        }
+
+        return a.provider.localeCompare(b.provider);
+      });
 
     // Workspace ranking: group by cwd, sort by tokens
     const wsMap = new Map<string, { project: string; sessions: number; tokens: number; cost: number }>();

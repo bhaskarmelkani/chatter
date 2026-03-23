@@ -105,8 +105,8 @@ export interface RateLimit {
 }
 
 export interface SessionBucket {
-  bucketStart: string; // ISO
-  label: string; // "14:00"
+  bucketStart: string; // ISO start of the trailing one-hour bucket
+  label: string; // localized bucket label for chart rendering
   sessions: number;
   activeSessions: number;
   tokens: number;
@@ -138,7 +138,7 @@ export interface DashboardMetrics {
   recentSessions: SessionSummary[];
   providers: ProviderHealth[];
   limits: RateLimit[];
-  // New analytics aggregates
+  // Rolling 24-hour analytics aggregates
   sessionBuckets: SessionBucket[];
   providerBreakdown: ProviderBreakdown[];
   workspaceRanking: WorkspaceRank[];

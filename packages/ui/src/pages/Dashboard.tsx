@@ -191,7 +191,7 @@ export default function Dashboard() {
       <div className="grid gap-5 xl:grid-cols-[1.3fr_0.7fr]">
         <Card className="bg-white/80">
           <CardHeader className="border-b">
-            <CardTitle>24h session trend</CardTitle>
+            <CardTitle>Rolling 24h session trend</CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
             <div className="h-72">
