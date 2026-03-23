@@ -111,22 +111,13 @@ export function AppSidebar() {
                   <span className="font-medium text-sidebar-foreground">Passive capture</span>
                 </div>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-3">
-                <p className="text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-sidebar-foreground/45">
-                  Focus
-                </p>
-                <p className="mt-2 text-sm leading-6 text-sidebar-foreground/80">
-                  Review active agent work, spot quota pressure early, and jump
-                  straight into the sessions that need attention.
-                </p>
-              </div>
             </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border/80 px-3 py-4 text-xs text-sidebar-foreground/55">
-        Built for local telemetry and coding agent operations.
+        Chatter v0.1
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -87,6 +87,12 @@ export function formatTokens(n: number): string {
   return String(n);
 }
 
+export function providerLabel(value: string): string {
+  if (value === "claude") return "Claude Code";
+  if (value === "codex") return "Codex";
+  return value;
+}
+
 export function formatCacheRatio(input: number, cacheRead: number): string {
   const totalInbound = input + cacheRead;
   if (totalInbound <= 0 || cacheRead <= 0) {

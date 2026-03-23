@@ -9,7 +9,6 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -63,7 +62,6 @@ export default function AgentDetail() {
       <PageHeader
         eyebrow="Agent"
         title={agent.name}
-        description="Provider-specific health, detection, active session presence, and current limit windows for this adapter."
         actions={
           <>
             <Link
@@ -79,28 +77,18 @@ export default function AgentDetail() {
         }
       />
 
-      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-[1.15fr_repeat(3,minmax(0,1fr))]">
-        <div className="space-y-3">
-          <p className="subtle-label">Adapter profile</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            This detail page stays focused on the adapter itself: installation,
-            live sessions, declared event coverage, and active limit windows.
-          </p>
-        </div>
+      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-3">
         <SummaryCard
           label="Installation"
           value={agent.detection.installed ? "Detected" : "Missing"}
-          note={agent.detection.version ?? "No binary version available"}
         />
         <SummaryCard
           label="Capture modes"
           value={agent.captureModes.length}
-          note={agent.captureModes.join(", ")}
         />
         <SummaryCard
           label="Active sessions"
           value={agent.activeSessions.length}
-          note="Live sessions currently reported by this adapter."
         />
       </section>
 
@@ -108,9 +96,6 @@ export default function AgentDetail() {
         <Card className="bg-white/80">
           <CardHeader className="border-b">
             <CardTitle>Adapter profile</CardTitle>
-            <CardDescription>
-              Declared capabilities and the local sources used by this adapter.
-            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-5 pt-4">
             <div className="rounded-[24px] bg-muted/55 p-4">
@@ -151,9 +136,6 @@ export default function AgentDetail() {
         <Card className="bg-white/80">
           <CardHeader className="border-b">
             <CardTitle>Active sessions</CardTitle>
-            <CardDescription>
-              Sessions currently reported as active by this adapter.
-            </CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 pt-4">
             {agent.activeSessions.length > 0 ? (
@@ -183,7 +165,7 @@ export default function AgentDetail() {
               ))
             ) : (
               <div className="rounded-[24px] border border-dashed px-4 py-10 text-sm text-muted-foreground">
-                No active sessions are currently reported for this agent.
+                No active sessions.
               </div>
             )}
           </CardContent>
@@ -193,9 +175,6 @@ export default function AgentDetail() {
       <Card className="bg-white/80">
         <CardHeader className="border-b">
           <CardTitle>Provider limits</CardTitle>
-          <CardDescription>
-            Current quota windows reported specifically by this adapter.
-          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 pt-4 lg:grid-cols-2 xl:grid-cols-3">
           {agent.limits.length > 0 ? (
@@ -207,7 +186,7 @@ export default function AgentDetail() {
             ))
           ) : (
             <div className="rounded-[24px] border border-dashed px-4 py-10 text-sm text-muted-foreground lg:col-span-2 xl:col-span-3">
-              This adapter has not reported any limit windows yet.
+              No limits reported.
             </div>
           )}
         </CardContent>

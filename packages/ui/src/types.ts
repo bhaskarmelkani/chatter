@@ -104,6 +104,31 @@ export interface RateLimit {
   description?: string;
 }
 
+export interface SessionBucket {
+  bucketStart: string; // ISO
+  label: string; // "14:00"
+  sessions: number;
+  activeSessions: number;
+  tokens: number;
+  cost: number;
+}
+
+export interface ProviderBreakdown {
+  provider: string;
+  status: HealthStatus;
+  activeSessions: number;
+  sessions24h: number;
+  tokens24h: number;
+  cost24h: number;
+}
+
+export interface WorkspaceRank {
+  project: string;
+  sessions: number;
+  tokens: number;
+  cost: number;
+}
+
 export interface DashboardMetrics {
   tokensToday: number;
   costToday: number;
@@ -113,6 +138,12 @@ export interface DashboardMetrics {
   recentSessions: SessionSummary[];
   providers: ProviderHealth[];
   limits: RateLimit[];
+  // New analytics aggregates
+  sessionBuckets: SessionBucket[];
+  providerBreakdown: ProviderBreakdown[];
+  workspaceRanking: WorkspaceRank[];
+  healthyCounts: { healthy: number; degraded: number; unreachable: number };
+  highPressureCount: number;
 }
 
 export interface SSEEvent {

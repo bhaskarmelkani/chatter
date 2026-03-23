@@ -9,7 +9,6 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -61,7 +60,6 @@ export default function Limits() {
       <PageHeader
         eyebrow="Limits"
         title="Quota monitor"
-        description="Track provider pressure, reset timing, and the limit windows most likely to block work if they keep climbing."
         actions={
           <Link
             to="/agents"
@@ -72,28 +70,18 @@ export default function Limits() {
         }
       />
 
-      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-[1.2fr_repeat(3,minmax(0,1fr))]">
-        <div className="space-y-3">
-          <p className="subtle-label">Pressure overview</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            These windows reflect current adapter telemetry, ranked to make the
-            most constrained provider budgets obvious first.
-          </p>
-        </div>
+      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-3">
         <SummaryCard
           label="Tracked windows"
           value={limits.length}
-          note="All current limit windows surfaced by installed agents."
         />
         <SummaryCard
           label="Nearest reset"
           value={nearestReset(limits)}
-          note="The soonest known reset across all providers."
         />
         <SummaryCard
           label="High pressure"
           value={highPressure.length}
-          note="Windows at or above 80% usage."
         />
       </section>
 
@@ -111,10 +99,6 @@ export default function Limits() {
                 <h2 className="section-title capitalize">
                   {hottest.provider} • {hottest.tier}
                 </h2>
-                <p className="section-description mt-2">
-                  This is the most constrained visible window right now. It
-                  should be watched before long-running agent work expands.
-                </p>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -152,9 +136,6 @@ export default function Limits() {
           <Card className="bg-white/80">
             <CardHeader className="border-b">
               <CardTitle>Priority windows</CardTitle>
-              <CardDescription>
-                Pressure-ranked limit cards with reset timing and usage breakdowns.
-              </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 pt-4 lg:grid-cols-2 xl:grid-cols-3">
               {rankedLimits.length > 0 ? (
@@ -166,8 +147,7 @@ export default function Limits() {
                 ))
               ) : (
                 <div className="rounded-[24px] border border-dashed px-4 py-10 text-sm text-muted-foreground lg:col-span-2 xl:col-span-3">
-                  The current telemetry sample does not include provider quota
-                  snapshots yet.
+                  No data yet.
                 </div>
               )}
             </CardContent>
@@ -176,9 +156,6 @@ export default function Limits() {
           <Card className="bg-white/80">
             <CardHeader className="border-b">
               <CardTitle>Quota list</CardTitle>
-              <CardDescription>
-                Compact side-by-side comparison for all visible provider windows.
-              </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
               <Table className="min-w-[860px]">

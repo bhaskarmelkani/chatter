@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -24,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { usePollingApi } from "@/hooks/useApi";
-import { formatCost, formatTokens } from "@/lib/pricing";
+import { formatCost, formatTokens, providerLabel } from "@/lib/pricing";
 import type { ProviderKind, SessionSummary } from "@/types";
 
 type SortKey = "recency" | "cost" | "tokens";
@@ -32,12 +31,6 @@ type SortKey = "recency" | "cost" | "tokens";
 interface SessionsResponse {
   sessions: SessionSummary[];
   total: number;
-}
-
-function providerLabel(value: string): string {
-  if (value === "claude") return "Claude Code";
-  if (value === "codex") return "Codex";
-  return value;
 }
 
 function buildSessionVolumeData(sessions: SessionSummary[]) {
@@ -155,18 +148,10 @@ export default function SessionExplorer() {
       <PageHeader
         eyebrow="Sessions"
         title="Session explorer"
-        description="Search and rank prompt-level work across coding agents, then pivot from the filtered results into the sessions that actually matter."
       />
 
       <section className="surface-panel grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto_auto]">
         <div className="space-y-3">
-          <div>
-            <p className="subtle-label">Filters</p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Search by title, model, or workspace. All charts and widgets below
-              reflect the current filtered set.
-            </p>
-          </div>
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
@@ -211,22 +196,18 @@ export default function SessionExplorer() {
         <SummaryCard
           label="Visible sessions"
           value={filtered.length}
-          note="Rows currently matching the active search and provider filters."
         />
         <SummaryCard
           label="Live share"
           value={liveShare}
-          note="Share of the current filtered set that is still active right now."
         />
         <SummaryCard
           label="Tokens in view"
           value={formatTokens(totalTokens)}
-          note="Combined visible prompt and response volume across filtered sessions."
         />
         <SummaryCard
           label="Cost in view"
           value={formatCost(totalCost)}
-          note="Estimated spend represented by the filtered result set."
         />
       </div>
 
@@ -247,10 +228,6 @@ export default function SessionExplorer() {
             <Card className="bg-white/80">
               <CardHeader className="border-b">
                 <CardTitle>Filtered session activity</CardTitle>
-                <CardDescription>
-                  Derived from the current visible result set, ordered by the
-                  most recent sessions in view.
-                </CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="h-80">
@@ -262,9 +239,6 @@ export default function SessionExplorer() {
             <Card className="bg-white/80">
               <CardHeader className="border-b">
                 <CardTitle>Provider split</CardTitle>
-                <CardDescription>
-                  Session count by provider for the filtered result set.
-                </CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="h-80">
@@ -278,9 +252,6 @@ export default function SessionExplorer() {
             <Card className="bg-white/80">
               <CardHeader className="border-b">
                 <CardTitle>Workspace ranking</CardTitle>
-                <CardDescription>
-                  Ranked by total token volume inside the active filtered set.
-                </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-3 pt-4">
                 {workspaceRanking.length > 0 ? (
@@ -310,7 +281,7 @@ export default function SessionExplorer() {
                   ))
                 ) : (
                   <div className="rounded-[24px] border border-dashed px-4 py-10 text-sm text-muted-foreground">
-                    Workspace rankings appear after matching sessions are visible.
+                    No data yet.
                   </div>
                 )}
               </CardContent>
@@ -319,10 +290,6 @@ export default function SessionExplorer() {
             <Card className="bg-white/80">
               <CardHeader className="border-b">
                 <CardTitle>Results</CardTitle>
-                <CardDescription>
-                  Ranked sessions for investigation, using the current search,
-                  provider filter, and sort mode.
-                </CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
                 <SessionList sessions={filtered} />

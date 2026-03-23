@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 interface PageHeaderProps {
   eyebrow?: string;
   title: string;
-  description: string;
+  description?: string;
   actions?: ReactNode;
 }
 
@@ -19,7 +19,7 @@ export function PageHeader({
         {eyebrow ? <span className="eyebrow-pill">{eyebrow}</span> : null}
         <div className="space-y-2">
           <h1 className="page-title">{title}</h1>
-          <p className="page-description max-w-3xl">{description}</p>
+          {description ? <p className="page-description max-w-3xl">{description}</p> : null}
         </div>
       </div>
       {actions ? (

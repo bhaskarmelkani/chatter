@@ -206,6 +206,73 @@ export function createServer(
       }
     }
 
+    // Session buckets + provider stats: single pass over todaySessions
+    const currentHour = new Date().getHours();
+    const buckets = Array.from({ length: currentHour + 1 }, (_, h) => ({
+      bucketStart: new Date(dayStart + h * 3600000).toISOString(),
+      label: `${String(h).padStart(2, "0")}:00`,
+      sessions: 0,
+      activeSessions: 0,
+      tokens: 0,
+      cost: 0,
+    }));
+    const providerStats = new Map<string, { sessions: number; tokens: number; cost: number }>();
+
+    for (const s of todaySessions) {
+      const h = new Date(s.started_at).getHours();
+      if (h < buckets.length) {
+        buckets[h].sessions++;
+        buckets[h].tokens += s.token_input + s.token_output;
+        buckets[h].cost += s.estimated_cost;
+        if (s.status === "active") buckets[h].activeSessions++;
+      }
+      const ps = providerStats.get(s.provider_id) ?? { sessions: 0, tokens: 0, cost: 0 };
+      ps.sessions++;
+      ps.tokens += s.token_input + s.token_output;
+      ps.cost += s.estimated_cost;
+      providerStats.set(s.provider_id, ps);
+    }
+
+    const sessionBuckets = buckets;
+    const providerBreakdown = providers.map((p) => {
+      const stats = providerStats.get(p.provider) ?? { sessions: 0, tokens: 0, cost: 0 };
+      return {
+        provider: p.provider,
+        status: p.status,
+        activeSessions: p.activeSessions,
+        sessions24h: stats.sessions,
+        tokens24h: stats.tokens,
+        cost24h: stats.cost,
+      };
+    });
+
+    // Workspace ranking: group by cwd, sort by tokens
+    const wsMap = new Map<string, { project: string; sessions: number; tokens: number; cost: number }>();
+    for (const s of visibleSessions) {
+      const project = s.cwd || "Unknown workspace";
+      const entry = wsMap.get(project) ?? { project, sessions: 0, tokens: 0, cost: 0 };
+      entry.sessions++;
+      entry.tokens += s.token_input + s.token_output;
+      entry.cost += s.estimated_cost;
+      wsMap.set(project, entry);
+    }
+    const workspaceRanking = Array.from(wsMap.values())
+      .sort((a, b) => b.tokens - a.tokens)
+      .slice(0, 10);
+
+    // Convenience counts (single pass)
+    const healthyCounts = { healthy: 0, degraded: 0, unreachable: 0 };
+    for (const p of providers) {
+      if (p.status === "healthy") healthyCounts.healthy++;
+      else if (p.status === "degraded") healthyCounts.degraded++;
+      else healthyCounts.unreachable++;
+    }
+
+    const serializedLimits = limits as Array<{ pressurePercent?: number }>;
+    const highPressureCount = serializedLimits.filter(
+      (l) => (l.pressurePercent ?? 0) >= 80,
+    ).length;
+
     return {
       tokensToday,
       costToday,
@@ -215,6 +282,11 @@ export function createServer(
       recentSessions,
       providers,
       limits,
+      sessionBuckets,
+      providerBreakdown,
+      workspaceRanking,
+      healthyCounts,
+      highPressureCount,
     };
   });
 

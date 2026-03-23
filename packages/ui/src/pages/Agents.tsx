@@ -45,7 +45,6 @@ export default function Agents() {
       <PageHeader
         eyebrow="Agents"
         title="Installed agents"
-        description="Review adapter detection, runtime health, supported capture modes, and current data coverage across every connected coding agent."
         actions={
           <Link
             to="/"
@@ -56,28 +55,18 @@ export default function Agents() {
         }
       />
 
-      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-[1.2fr_repeat(3,minmax(0,1fr))]">
-        <div className="space-y-3">
-          <p className="subtle-label">Adapter coverage</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            This page tracks which agent adapters are installed, healthy, and
-            ready to contribute telemetry into the local dashboard.
-          </p>
-        </div>
+      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-3">
         <SummaryCard
           label="Installed"
           value={installed}
-          note="Adapters detected on this machine."
         />
         <SummaryCard
           label="Healthy"
           value={healthy}
-          note="Providers currently returning an OK health state."
         />
         <SummaryCard
           label="Needs review"
           value={degraded}
-          note="Providers that are degraded, missing, or returning errors."
         />
       </section>
 
@@ -140,10 +129,7 @@ export default function Agents() {
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between gap-3">
-                  <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-                    {agent.health.details}
-                  </p>
+                <div className="flex items-center justify-end gap-3">
                   <Link
                     to={`/agents/${agent.id}`}
                     className={cn(

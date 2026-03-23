@@ -54,9 +54,9 @@
   body {
     min-height: 100vh;
     background:
-      radial-gradient(circle at top left, hsl(var(--accent) / 0.14), transparent 28%),
-      radial-gradient(circle at top right, hsl(var(--primary) / 0.08), transparent 22%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(210 32% 97%) 100%);
+      radial-gradient(circle at top left, hsl(var(--accent) / 0.06), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--primary) / 0.04), transparent 22%),
+      hsl(var(--background));
     color: hsl(var(--foreground));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -104,10 +104,6 @@
     @apply text-[2.15rem] font-semibold tracking-[-0.05em] text-foreground;
   }
 
-  .metric-note {
-    @apply text-sm leading-6 text-muted-foreground;
-  }
-
   .data-bar {
     @apply h-2.5 overflow-hidden rounded-full bg-muted;
   }
@@ -145,7 +141,4 @@
     @apply text-lg font-semibold tracking-[-0.03em] text-foreground;
   }
 
-  .section-description {
-    @apply text-sm leading-6 text-muted-foreground;
-  }
 }

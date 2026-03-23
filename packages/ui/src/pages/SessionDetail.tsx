@@ -9,7 +9,6 @@ import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -98,7 +97,6 @@ export default function SessionDetail() {
       <PageHeader
         eyebrow="Session"
         title={session.title || "Untitled session"}
-        description="Inspect prompt flow, tool behavior, token mix, and session-specific cost signals without losing the underlying trace context."
         actions={
           <>
             <Link
@@ -115,14 +113,7 @@ export default function SessionDetail() {
         }
       />
 
-      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-[1.15fr_repeat(3,minmax(0,1fr))]">
-        <div className="space-y-3">
-          <p className="subtle-label">Session context</p>
-          <p className="text-sm leading-6 text-muted-foreground">
-            This trace stays session-centric: replay the conversation, inspect
-            tool calls, and understand where tokens and cost accumulated.
-          </p>
-        </div>
+      <section className="surface-panel grid gap-4 p-5 lg:grid-cols-3">
         <Card className="bg-white/80">
           <CardHeader className="pb-2">
             <CardTitle className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -133,18 +124,15 @@ export default function SessionDetail() {
             <p className="break-all text-sm font-medium leading-6 text-foreground">
               {session.project}
             </p>
-            <p className="metric-note">Source workspace reported by the adapter.</p>
           </CardContent>
         </Card>
         <SummaryCard
           label="Duration"
           value={durationStr(session.duration)}
-          note="Elapsed capture time for this session."
         />
         <SummaryCard
           label="Estimated cost"
           value={formatCost(session.cost)}
-          note="Cost derived from currently known pricing data."
         />
       </section>
 
@@ -152,22 +140,18 @@ export default function SessionDetail() {
         <SummaryCard
           label="Model"
           value={session.model}
-          note="Primary model reported for this session."
         />
         <SummaryCard
           label="Total tokens"
           value={formatTokens(session.tokensIn + session.tokensOut)}
-          note="Direct prompt and completion volume."
         />
         <SummaryCard
           label="Cache read ratio"
           value={formatCacheRatio(session.tokensIn, session.cacheRead)}
-          note="How much prompt volume was served from cache."
         />
         <SummaryCard
           label="Tool calls"
           value={session.tools.length}
-          note="Captured tool execution records tied to this session."
         />
       </div>
 
@@ -182,9 +166,6 @@ export default function SessionDetail() {
           <Card className="bg-white/80">
             <CardHeader className="border-b">
               <CardTitle>Prompt and response replay</CardTitle>
-              <CardDescription>
-                Full message sequence with captured tool call context.
-              </CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
               <ConversationView messages={session.messages} />
@@ -198,26 +179,20 @@ export default function SessionDetail() {
               <SummaryCard
                 label="Tool calls"
                 value={session.tools.length}
-                note="Number of captured tool execution records."
               />
               <SummaryCard
                 label="Longest call"
                 value={`${longestCall}ms`}
-                note="Longest single tool execution in this session."
               />
               <SummaryCard
                 label="Unique tools"
                 value={new Set(session.tools.map((tool) => tool.name)).size}
-                note="Distinct tool names observed in the timeline."
               />
             </div>
 
             <Card className="bg-white/80">
               <CardHeader className="border-b">
                 <CardTitle>Captured tool activity</CardTitle>
-                <CardDescription>
-                  Ordered list of tool inputs and outputs tied to the session.
-                </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4 pt-4">
                 {session.tools.length > 0 ? (
@@ -258,7 +233,7 @@ export default function SessionDetail() {
                   ))
                 ) : (
                   <div className="rounded-[24px] border border-dashed px-4 py-10 text-sm text-muted-foreground">
-                    No tool calls were captured for this session.
+                    No tool calls captured.
                   </div>
                 )}
               </CardContent>
@@ -271,9 +246,6 @@ export default function SessionDetail() {
             <Card className="bg-white/80">
               <CardHeader className="border-b">
                 <CardTitle>Token profile</CardTitle>
-                <CardDescription>
-                  Relative share of prompt, output, and cache activity.
-                </CardDescription>
               </CardHeader>
               <CardContent className="grid gap-5 pt-4">
                 <TokenBar
@@ -307,30 +279,7 @@ export default function SessionDetail() {
                     ? "Input-heavy"
                     : "Output-heavy"
                 }
-                note="Whether the session spent more volume on prompts or on model output."
               />
-              <Card className="bg-white/80">
-                <CardHeader className="border-b">
-                  <CardTitle>Interpretation</CardTitle>
-                  <CardDescription>
-                    Useful context for reading the numbers in this trace.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4 pt-4 text-sm text-muted-foreground">
-                  <p>
-                    Input-heavy sessions often indicate long prompts, repeated
-                    context, or large tool outputs being passed back into the model.
-                  </p>
-                  <p>
-                    Output-heavy sessions tend to reflect synthesis, drafting, or
-                    explanation-heavy work.
-                  </p>
-                  <p>
-                    Cache leverage is especially important for longer-running
-                    sessions where repeated context should become cheaper over time.
-                  </p>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </TabsContent>
