@@ -1,0 +1,20 @@
+{
+  "name": "chatter",
+  "private": true,
+  "description": "Coding agent control plane for macOS",
+  "scripts": {
+    "build": "pnpm -r build",
+    "dev": "pnpm -r --parallel dev",
+    "test": "pnpm --filter @chatter/core test && pnpm --filter @chatter/daemon test && pnpm --filter @chatter/cli test && pnpm --filter @chatter/ui test",
+    "lint": "pnpm --filter @chatter/core lint && pnpm --filter @chatter/daemon lint && pnpm --filter @chatter/cli lint && pnpm --filter @chatter/ui lint",
+    "typecheck": "pnpm lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
